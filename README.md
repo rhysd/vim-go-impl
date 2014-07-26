@@ -30,6 +30,12 @@ You need not add single quotes around the receiver.
 
 - [impl](https://github.com/josharian/impl) command
 
+## Future
+
+- Completion for the command
+
+Pull requests are welcome!
+
 ## License
 
     The MIT License (MIT)
