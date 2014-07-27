@@ -1,6 +1,21 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:goos = $GOOS
+let s:goarch = $GOARCH
+
+if len(s:goos) == 0
+    if exists('g:golang_goos')
+        let s:goos = g:golang_goos
+    elseif has('win32') || has('win64')
+        let s:goos = 'windows'
+    elseif has('macunix')
+        let s:goos = 'darwin'
+    else
+        let s:goos = '*'
+    endif
+endif
+
 let g:goimpl#cmd = get(g:, 'goimpl#cmd', 'impl')
 
 function! s:error(msg)
@@ -38,6 +53,10 @@ function! s:system(str, ...)
     return output
 endfunction
 
+function! s:shell_error()
+    return s:has_vimproc() ? vimproc#get_last_status() : v:shell_error
+endfunction
+
 function! goimpl#impl(recv, iface)
     if !executable(g:goimpl#cmd)
         call s:error(g:goimpl#cmd . ' command is not found. Please check g:goimpl#cmd')
@@ -46,9 +65,9 @@ function! goimpl#impl(recv, iface)
 
     let result = s:system(join([g:goimpl#cmd, string(a:recv), string(a:iface)], " "))
 
-    if s:has_vimproc() ? vimproc#get_last_status() : v:shell_error
-         call s:error(g:goimpl#cmd . ' command failed: ' . result)
-         return ''
+    if s:shell_error()
+        call s:error(g:goimpl#cmd . ' command failed: ' . result)
+        return ''
     endif
 
     return result
@@ -64,6 +83,40 @@ function! goimpl#do(...)
     let iface = a:000[-1]
 
     put =goimpl#impl(recv, iface)
+endfunction
+
+function! s:get_interface_list(pkg)
+    let contents = split(s:system('godoc ' . a:pkg), "\n")
+    if s:shell_error()
+        return []
+    endif
+
+    call filter(contents, 'v:val =~# ''^type\s\+\h\w*\s\+interface''')
+    return map(contents, 'a:pkg . "." . matchstr(v:val, ''^type\s\+\zs\h\w*\ze\s\+interface'')')
+endfunction
+
+" Complete after '.' as interface
+function! goimpl#complete(arglead, cmdline, cursorpos)
+    if !executable('godoc')
+        return []
+    endif
+
+    let words = split(a:cmdline, '\s\+', 1)
+    if len(words) <= 3
+        " TODO
+        return []
+    endif
+
+    let parts = split(words[-1], '\.', 1)
+    if len(parts) < 2
+        " TODO
+        return []
+    endif
+
+    let interface = parts[-1]
+    let package = join(parts[:-2], '.')
+
+    return s:get_interface_list(package)
 endfunction
 
 let &cpo = s:save_cpo
