@@ -32,7 +32,7 @@ You need not add single quotes around the receiver.
 
 ## Future
 
-- Completion for the command
+- Completion for the command (Now you can complete interface names)
 
 Pull requests are welcome!
 
