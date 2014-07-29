@@ -168,7 +168,7 @@ function! goimpl#complete(arglead, cmdline, cursorpos)
         return []
     endif
 
-    if a:cmdline =~# '\s\+$'
+    if words[-1] ==# ''
         return s:uniq(sort(s:go_packages(s:root_dirs())))
     elseif words[-1] =~# '^\h\w*$'
         return s:uniq(sort(filter(s:go_packages(s:root_dirs()), 'stridx(v:val, words[-1]) == 0')))
