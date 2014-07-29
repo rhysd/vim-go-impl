@@ -37,7 +37,7 @@ You need not add single quotes around the receiver.
 
     The MIT License (MIT)
 
-    Copyright (c) 2013 rhysd
+    Copyright (c) 2014 rhysd
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
