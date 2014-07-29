@@ -14,6 +14,8 @@ Simply do:
 :GoImpl {receiver} {interface}
 ```
 
+You can use completion for package name and interface name in `{interface}`
+
 For example:
 
 ```
@@ -28,13 +30,8 @@ You need not add single quotes around the receiver.
 
 ## Requirements
 
+- `go` command
 - [impl](https://github.com/josharian/impl) command
-
-## Future
-
-- Completion for the command
-
-Pull requests are welcome!
 
 ## License
 
