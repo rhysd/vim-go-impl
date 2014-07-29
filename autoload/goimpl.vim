@@ -3,26 +3,7 @@ set cpo&vim
 
 let g:goimpl#gocmd = get(g:, 'goimpl#gocmd', 'go')
 let g:goimpl#cmd = get(g:, 'goimpl#cmd', 'impl')
-
-function! s:chomp(str)
-    return a:str[len(a:str)-1] ==# "\n" ? a:str[:len(a:str)-2] : a:str
-endfunction
-
-function! s:os_arch()
-    let os = s:chomp(system(g:goimpl#gocmd . ' env GOOS'))
-    if v:shell_error
-        return ''
-    endif
-
-    let arch = s:chomp(system(g:goimpl#gocmd . ' env GOARCH'))
-    if v:shell_error
-        return ''
-    endif
-
-    return os . '_' . arch
-endfunction
-
-let g:goimpl#os_arch = get(g:, 'goimpl#os_arch', s:os_arch())
+let g:goimpl#godoccmd = get(g:, 'goimpl#godoccmd', 'godoc')
 
 function! s:error(msg)
     echohl ErrorMsg | echomsg a:msg | echohl None
@@ -62,6 +43,26 @@ endfunction
 function! s:shell_error()
     return s:has_vimproc() ? vimproc#get_last_status() : v:shell_error
 endfunction
+
+function! s:chomp(str)
+    return a:str[len(a:str)-1] ==# "\n" ? a:str[:len(a:str)-2] : a:str
+endfunction
+
+function! s:os_arch()
+    let os = s:chomp(s:system(g:goimpl#gocmd . ' env GOOS'))
+    if s:shell_error()
+        return ''
+    endif
+
+    let arch = s:chomp(s:system(g:goimpl#gocmd . ' env GOARCH'))
+    if s:shell_error()
+        return ''
+    endif
+
+    return os . '_' . arch
+endfunction
+
+let g:goimpl#os_arch = get(g:, 'goimpl#os_arch', s:os_arch())
 
 function! goimpl#impl(recv, iface)
     if !executable(g:goimpl#cmd)
@@ -114,8 +115,8 @@ endif
 function! s:root_dirs()
     let dirs = []
 
-    let root = substitute(s:chomp(system(g:goimpl#gocmd . ' env GOROOT')), '\\', '/', 'g')
-    if v:shell_error
+    let root = substitute(s:chomp(s:system(g:goimpl#gocmd . ' env GOROOT')), '\\', '/', 'g')
+    if s:shell_error()
         return []
     endif
 
@@ -124,8 +125,8 @@ function! s:root_dirs()
     endif
 
     let path_sep = has('win32') || has('win64') ? ';' : ':'
-    let paths = map(split(s:chomp(system(g:goimpl#gocmd . ' env GOPATH')), path_sep), "substitute(v:val, '\\', '/', 'g')")
-    if v:shell_error
+    let paths = map(split(s:chomp(s:system(g:goimpl#gocmd . ' env GOPATH')), path_sep), "substitute(v:val, '\\', '/', 'g')")
+    if s:shell_error()
         return []
     endif
 
@@ -146,7 +147,7 @@ function! s:go_packages(dirs)
 endfunction
 
 function! s:interface_list(pkg)
-    let contents = split(s:system('godoc ' . a:pkg), "\n")
+    let contents = split(s:system(g:goimpl#godoccmd . ' ' . a:pkg), "\n")
     if s:shell_error()
         return []
     endif
@@ -157,7 +158,7 @@ endfunction
 
 " Complete after '.' as interface
 function! goimpl#complete(arglead, cmdline, cursorpos)
-    if !executable('godoc')
+    if !executable(g:goimpl#godoccmd)
         return []
     endif
 
