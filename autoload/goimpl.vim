@@ -125,7 +125,7 @@ function! s:root_dirs()
     endif
 
     let path_sep = has('win32') || has('win64') ? ';' : ':'
-    let paths = map(split(s:chomp(s:system(g:goimpl#gocmd . ' env GOPATH')), path_sep), "substitute(v:val, '\\', '/', 'g')")
+    let paths = map(split(s:chomp(s:system(g:goimpl#gocmd . ' env GOPATH')), path_sep), "substitute(v:val, '\\\\', '/', 'g')")
     if s:shell_error()
         return []
     endif
@@ -156,7 +156,7 @@ function! s:interface_list(pkg)
     return map(contents, 'a:pkg . "." . matchstr(v:val, ''^type\s\+\zs\h\w*\ze\s\+interface'')')
 endfunction
 
-" Complete after '.' as interface
+" Complete package and interface for {interface}
 function! goimpl#complete(arglead, cmdline, cursorpos)
     if !executable(g:goimpl#godoccmd)
         return []
@@ -175,7 +175,7 @@ function! goimpl#complete(arglead, cmdline, cursorpos)
     elseif words[-1] =~# '^\h\w*\.\%(\h\w*\)\=$'
         let [pkg, interface] = split(words[-1], '\.', 1)
         echomsg pkg
-        return s:uniq(sort(filter(s:interface_list(pkg), 'stridx(v:val, words[-1]) == 0')))
+        return s:uniq(sort(filter(s:interface_list(pkg), 'v:val =~? words[-1]')))
     else
         return []
     endif
