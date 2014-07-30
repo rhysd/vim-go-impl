@@ -88,8 +88,15 @@ function! goimpl#do(...)
 
     let recv = join(a:000[:-2], ' ')
     let iface = a:000[-1]
+    let result = goimpl#impl(recv, iface)
 
-    put =goimpl#impl(recv, iface)
+    if result ==# ''
+        return
+    end
+
+    let pos = getpos('.')
+    put =result
+    call setpos('.', pos)
 endfunction
 
 if exists('*uniq')
