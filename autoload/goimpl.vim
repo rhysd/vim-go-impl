@@ -111,7 +111,7 @@ function! goimpl#impl(recv, iface)
         return ''
     endif
 
-    let result = s:system(printf("%s '%s' '%s'", g:goimpl#cmd, a:recv, a:iface))
+    let result = s:system(printf("%s '%s' '%s'", binpath, a:recv, a:iface))
 
     if s:shell_error()
         call s:error(g:goimpl#cmd . ' command failed: ' . result)
