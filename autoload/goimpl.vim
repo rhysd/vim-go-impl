@@ -6,8 +6,6 @@ let g:goimpl#cmd = get(g:, 'goimpl#cmd', 'impl')
 let g:goimpl#godoccmd = get(g:, 'goimpl#godoccmd', 'godoc')
 
 function! s:bin_path()
-    let bin_path = ""
-
     " check if our global custom path is set, if not check if $GOBIN is set so
     " we can use it, otherwise use $GOPATH + '/bin'
     if exists("g:go_bin_path")
@@ -114,7 +112,7 @@ function! goimpl#impl(recv, iface)
     let result = s:system(printf("%s '%s' '%s'", binpath, a:recv, a:iface))
 
     if s:shell_error()
-        call s:error(g:goimpl#cmd . ' command failed: ' . result)
+        call s:error(binpath . ' command failed: ' . result)
         return ''
     endif
 
