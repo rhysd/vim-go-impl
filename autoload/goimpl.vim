@@ -5,6 +5,44 @@ let g:goimpl#gocmd = get(g:, 'goimpl#gocmd', 'go')
 let g:goimpl#cmd = get(g:, 'goimpl#cmd', 'impl')
 let g:goimpl#godoccmd = get(g:, 'goimpl#godoccmd', 'godoc')
 
+function! s:bin_path()
+    " check if our global custom path is set, if not check if $GOBIN is set so
+    " we can use it, otherwise use $GOPATH + '/bin'
+    if exists("g:go_bin_path")
+        return g:go_bin_path
+    elseif !empty($GOBIN)
+        return $GOBIN
+    elseif !empty($GOPATH)
+        return $GOPATH . '/bin'
+    endif
+
+    return ''
+endfunction
+
+function! s:check_bin_path(binpath)
+    let binpath = a:binpath
+    if executable(binpath)
+        return binpath
+    endif
+
+    " just get the basename
+    let basename = fnamemodify(binpath, ":t")
+
+    " check if we have an appropriate bin_path
+    let go_bin_path = s:bin_path()
+    if empty(go_bin_path)
+        return ''
+    endif
+
+    let new_binpath = go_bin_path . '/' . basename
+    if !executable(new_binpath)
+        return ''
+    endif
+
+    return new_binpath
+endfunction
+
+
 function! s:error(msg)
     echohl ErrorMsg | echomsg a:msg | echohl None
 endfunction
@@ -65,15 +103,16 @@ endfunction
 let g:goimpl#os_arch = get(g:, 'goimpl#os_arch', s:os_arch())
 
 function! goimpl#impl(recv, iface)
-    if !executable(g:goimpl#cmd)
+    let binpath = s:check_bin_path(g:goimpl#cmd)
+    if empty(binpath)
         call s:error(g:goimpl#cmd . ' command is not found. Please check g:goimpl#cmd')
         return ''
     endif
 
-    let result = s:system(printf("%s '%s' '%s'", g:goimpl#cmd, a:recv, a:iface))
+    let result = s:system(printf("%s '%s' '%s'", binpath, a:recv, a:iface))
 
     if s:shell_error()
-        call s:error(g:goimpl#cmd . ' command failed: ' . result)
+        call s:error(binpath . ' command failed: ' . result)
         return ''
     endif
 
