@@ -6,6 +6,8 @@ This plugin is created to use [impl](https://github.com/josharian/impl) in your 
 
 ![screenshot](http://gifzo.net/BPFMRsWdNwe.gif)
 
+NOTE: This plugin is already integrated to [vim-go](https://github.com/fatih/vim-go).  If you're using it, you need not additionally install this plugin.
+
 ## Usage
 
 Simply do:
