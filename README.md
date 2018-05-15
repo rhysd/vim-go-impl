@@ -4,9 +4,7 @@ Use [impl](https://github.com/josharian/impl) in Your Vim
 [impl](https://github.com/josharian/impl) is a very handy tool to generate method stubs for implementing an interface.
 This plugin is created to use [impl](https://github.com/josharian/impl) in your Vim.
 
-![screenshot](http://gifzo.net/BPFMRsWdNwe.gif)
-
-NOTE: This plugin is already integrated to [vim-go](https://github.com/fatih/vim-go).  If you're using it, you need not additionally install this plugin.
+**NOTE:** This plugin is already integrated to [vim-go](https://github.com/fatih/vim-go).  If you're using it, you don't need to install any additional plugins.
 
 ## Usage
 
